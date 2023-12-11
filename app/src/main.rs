@@ -1,373 +1,168 @@
-// use std::collections::HashMap;
+// ! Option <T> если отсутствует значение или пустое
+
+// ? Стандартная библиотека Rust предоставляет Option<T>перечисление, которое можно использовать, когда возможно отсутствие значения. Option<T>широко используется в коде Rust. Это полезно для работы со значениями, которые могут существовать или быть пустыми.
 
 // fn main() {
-//      todo! Создаем HashMap для хранения отзывов
-//     let mut reviews: HashMap<String, String> = HashMap::new();
+//     let num = vec!["1", "2", "3", "4", "5"];
 
-//     // Добавляем отзывы о книгах
-//     reviews.insert(
-//         String::from("Ancient Roman History"),
-//         String::from("Very accurate."),
-//     );
-//     reviews.insert(
-//         String::from("Cooking with Rhubarb"),
-//         String::from("Sweet recipes."),
-//     );
-//     reviews.insert(
-//         String::from("Programming in Rust"),
-//         String::from("Great examples."),
-//     );
+//     let first = num.get(0);
+//     println!("{:?}", first);
 
-//     // Ищем отзыв для конкретной книги
-//     let book: &str = "Programming in Rust";
+//     let third = num.get(2);
+//     println!("{:?}", third);
 
-//     // удаляем отзив
-//     // Remove book review
-//     let obsolete: &str = "Ancient Roman History";
-//     println!("\n'{}\' removed.", obsolete);
-//     reviews.remove(obsolete);
+//     let non_existent = num.get(99);
+//     println!("{:?}", non_existent);
 
-//     // Confirm book review removed
-//     println!("\nReview for \'{}\': {:?}", obsolete, reviews.get(obsolete));
+// ? match В Rust есть мощный оператор match. Вы можете использовать его для управления ходом вашей программы, предоставляя шаблоны. При matchобнаружении соответствующего шаблона он запускает код, который вы предоставили с этим шаблоном.
 
-//     println!("\nReview for \'{}\': {:?}", book, reviews.get(book));
+// for &index in [0, 2, 99].iter() {
+//     match num.get(index) {
+//         Some(&"3") => println!("2 are awesome!!!"),
+//         Some(num_name) => println!("It's a delicious {}!", num_name),
+//         None => println!("There is no fruit! 😥"),
+//     }
 // }
-//  todo! Упражнение. Используйте хэш-карту для отслеживания заказов. ====================================================================
-// #[derive(PartialEq, Debug)]
-// struct Car {
-//     color: String,
-//     motor: Transmission,
-//     roof: bool,
-//     age: (Age, u32),
+// ? Выражение if let Rust предлагает удобный способ проверить, соответствует ли значение одному шаблону.
+
+//     let a_number: Option<u8> = Some(7);
+//     match a_number {
+//         Some(7) => println!("That's my lucky number! "),
+//         _ => {}
+//     }
+// }
+//? Используйте unwrap и expect Вы можете попытаться получить доступ к внутреннему значению типа Optionнапрямую, используя unwrapметод. Однако будьте осторожны, потому что этот метод вызовет панику, если вариант — None.
+
+//     //unwrap
+// let gift = Some("candy");
+// assert_eq!(gift.unwrap(), "candy");
+
+// let empty_gift: Option<&str> = None;
+// assert_eq!(empty_gift.unwrap(), "candy"); // This will panic!
+
+//    //expect
+// let a = Some("value");
+// assert_eq!(a.expect("fruits are healthy"), "value");
+
+// let b: Option<&str> = None;
+// b.expect("fruits are healthy"); // panics with `fruits are healthy`
+// // ? метод котоий не приводит к панике
+// assert_eq!(Some("dog").unwrap_or("cat"), "dog");
+// assert_eq!(None.unwrap_or("cat"), "cat");
+
+//! Упражнение. Использование типа «Option» для устранения отсутствия
+// struct Person {
+//     first: String,
+//     middle: Option<String>,
+//     last: String,
 // }
 
-// #[derive(PartialEq, Debug)]
-// enum Transmission {
-//     Manual,
-//     SemiAuto,
-//     Automatic,
-// }
+// fn build_full_name(person: &Person) -> String {
+//     let mut full_name = String::new();
+//     full_name.push_str(&person.first);
+//     full_name.push_str(" ");
 
-// #[derive(PartialEq, Debug)]
-// enum Age {
-//     New,
-//     Used,
-// }
+//     // TODO: Implement the part of this function that handles the person's middle name.
 
-// // Get the car quality by testing the value of the input argument
-// // - miles (u32)
-// // Return tuple with car age ("New" or "Used") and mileage
-// fn car_quality(miles: u32) -> (Age, u32) {
-//     // Check if car has accumulated miles
-//     // Return tuple early for Used car
-//     if miles > 0 {
-//         return (Age::Used, miles);
+//     if let Some(middle_name) = &person.middle {
+//         full_name.push_str(middle_name);
+//         full_name.push_str(" ");
 //     }
 
-//     // Return tuple for New car, no need for "return" keyword or semicolon
-//     (Age::New, miles)
-// }
-
-// // Build "Car" using input arguments
-// fn car_factory(order: i32, miles: u32) -> Car {
-//     let colors = ["Blue", "Green", "Red", "Silver"];
-
-//     // Prevent panic: Check color index for colors array, reset as needed
-//     // Valid color = 1, 2, 3, or 4
-//     // If color > 4, reduce color to valid index
-//     let mut color = order as usize;
-//     if color > 4 {
-//         // color = 5 --> index 1, 6 --> 2, 7 --> 3, 8 --> 4
-//         color = color - 4;
-//     }
-
-//     // Add variety to orders for motor type and roof type
-//     let mut motor = Transmission::Manual;
-//     let mut roof = true;
-//     if order % 3 == 0 {
-//         // 3, 6, 9
-//         motor = Transmission::Automatic;
-//     } else if order % 2 == 0 {
-//         // 2, 4, 8, 10
-//         motor = Transmission::SemiAuto;
-//         roof = false;
-//     } // 1, 5, 7, 11
-
-//     // Return requested "Car"
-//     Car {
-//         color: String::from(colors[(color - 1) as usize]),
-//         motor: motor,
-//         roof: roof,
-//         age: car_quality(miles),
-//     }
+//     full_name.push_str(&person.last);
+//     full_name
 // }
 
 // fn main() {
-//     use std::collections::HashMap;
-//     let mut orders: HashMap<i32, Car> = HashMap::new();
-//     // Initialize counter variable
-
-//     let mut order = 1;
-//     // Declare a car as mutable "Car" struct
-//     let mut car: Car;
-
-//     // Order 6 cars, increment "order" for each request
-//     // Car order #1: Used, Hard top
-
-//     car = car_factory(order, 1000);
-//     orders.insert(order, car);
-//     println!("Car order {}: {:?}", order, orders.get(&order));
-
-//     // Car order #2: Used, Convertible
-//     order = order + 1;
-//     car = car_factory(order, 2000);
-//     orders.insert(order, car);
-//     println!("Car order {}: {:?}", order, orders.get(&order));
-
-//     // Car order #3: New, Hard top
-//     order = order + 1;
-//     car = car_factory(order, 0);
-//     orders.insert(order, car);
-//     println!("Car order {}: {:?}", order, orders.get(&order));
-
-//     // Car order #4: New, Convertible
-//     order = order + 1;
-//     car = car_factory(order, 0);
-//     orders.insert(order, car);
-//     println!("Car order {}: {:?}", order, orders.get(&order));
-//     // Car order #5: Used, Hard top
-//     order = order + 1;
-//     car = car_factory(order, 3000);
-//     orders.insert(order, car);
-//     println!("Car order {}: {:?}", order, orders.get(&order));
-
-//     //use std::num::ParseIntError;
-
-//     // Car order #6: Used, Hard top
-//     order = order + 1;
-//     car = car_factory(order, 4000);
-//     orders.insert(order, car);
-//     println!("Car order {}: {:?}", order, orders.get(&order));
-// }
-// todo! Используйте выражения for, while и цикл.
-// ? Выражение loop создает бесконечный цикл
-// fn main() {
-//     let mut counter = 1;
-//     let stop_loop = loop {
-//         counter *= 2;
-//         if counter > 100 {
-//             break counter;
-//         }
+//     let john = Person {
+//         first: String::from("James"),
+//         middle: Some(String::from("Oliver")),
+//         last: String::from("Smith"),
 //     };
-//     println!("Break loop counter = {}.", stop_loop);
+//     assert_eq!(build_full_name(&john), "James Oliver Smith");
+
+//     let alice = Person {
+//         first: String::from("Alice"),
+//         middle: None,
+//         last: String::from("Stevens"),
+//     };
+//     assert_eq!(build_full_name(&alice), "Alice Stevens");
+
+//     let bob = Person {
+//         first: String::from("Robert"),
+//         middle: Some(String::from("Murdock")),
+//         last: String::from("Jones"),
+//     };
+//     assert_eq!(build_full_name(&bob), "Robert Murdock Jones");
 // }
-//   ? Loop a while
-// fn main () {
-//     let mut counter = 0;
-//     while counter < 5 {
-//         println! ("We loop a while...");
-//         counter = counter + 1;
-//     }
+//    ? Используйте тип результата для обработки ошибок (Result тип)
+// ? В отличие от Optionтипа, описывающего возможность отсутствия значения , Resultтип лучше всего подходит там, где могут произойти сбои .
+// enum Result<T, E> {
+//     Ok(T):  // A value T was obtained.
+//     Err(E): // An error of type E was encountered instead.
 // }
-// //? Loop for these values
-// fn main() {
-//     let big_birds = ["ostrich", "peacock", "stork"];
-//     for bird in big_birds.iter() {
-//         println!("The {} is a big dird", bird);
-//     }
+// //=========================================
 
-//     for number in 0..5 {
-//         println!("{}", number * 2);
-//     }
-// }
-// todo! Упражнение. Использование цикла для перебора данных.Повторение действий с выражением цикла
-// #[derive(PartialEq, Debug)]
-// struct Car {
-//     color: String,
-//     motor: Transmission,
-//     roof: bool,
-//     age: (Age, u32),
-// }
+// #[derive(Debug)]
+// struct DivisionByZeroError;
 
-// #[derive(PartialEq, Debug)]
-// enum Transmission {
-//     Manual,
-//     SemiAuto,
-//     Automatic,
-// }
-
-// #[derive(PartialEq, Debug)]
-// enum Age {
-//     New,
-//     Used,
-// }
-
-// // Get the car quality by testing the value of the input argument
-// // - miles (u32)
-// // Return tuple with car age ("New" or "Used") and mileage
-// fn car_quality(miles: u32) -> (Age, u32) {
-//     // Check if car has accumulated miles
-//     // Return tuple early for Used car
-//     if miles > 0 {
-//         return (Age::Used, miles);
-//     }
-
-//     // Return tuple for New car, no need for "return" keyword or semicolon
-//     (Age::New, miles)
-// }
-
-// // Build "Car" using input arguments
-// fn car_factory(order: i32, miles: u32) -> Car {
-//     let colors = ["Blue", "Green", "Red", "Silver"];
-
-//     // Prevent panic: Check color index for colors array, reset as needed
-//     // Valid color = 1, 2, 3, or 4
-//     // If color > 4, reduce color to valid index
-//     let mut color = order as usize;
-//     if color > 4 {
-//         // color = 5 --> index 1, 6 --> 2, 7 --> 3, 8 --> 4
-//         color = color - 4;
-//     }
-
-//     // Add variety to orders for motor type and roof type
-//     let mut motor = Transmission::Manual;
-//     let mut roof = true;
-//     if order % 3 == 0 {
-//         // 3, 6, 9
-//         motor = Transmission::Automatic;
-//     } else if order % 2 == 0 {
-//         // 2, 4, 8, 10
-//         motor = Transmission::SemiAuto;
-//         roof = false;
-//     } // 1, 5, 7, 11
-
-//     // Return requested "Car"
-//     Car {
-//         color: String::from(colors[(color - 1) as usize]),
-//         motor: motor,
-//         roof: roof,
-//         age: car_quality(miles),
+// fn safe_division(dividend: f64, divisor: f64) -> Result<f64, DivisionByZeroError> {
+//     if divisor == 0.0 {
+//         Err(DivisionByZeroError)
+//     } else {
+//         Ok(dividend / divisor)
 //     }
 // }
 
 // fn main() {
-//     use std::collections::HashMap;
-
-//     let mut orders: HashMap<i32, Car> = HashMap::new();
-//     let mut car: Car;
-
-//     // Start with zero miles
-//     let mut miles = 0;
-
-//     // Loop to fulfill orders for 6 cars
-//     for order in 1..=6 {
-//         // Call car_factory to fulfill order
-//         car = car_factory(order, miles);
-//         orders.insert(order, car);
-
-//         // Call println! to show order details from the hash map
-//         println!("Car order {}: {:?}", order, orders.get(&order));
-
-//         // Reset miles for order variety
-//         if miles == 2100 {
-//             miles = 0;
-//         } else {
-//             miles += 700;
-//         }
-//     }
+//     println!("{:?}", safe_division(9.0, 3.0));
+//     println!("{:?}", safe_division(4.0, 0.0));
+//     println!("{:?}", safe_division(0.0, 2.0));
 // }
-// todo! Увеличение заказов автомобилей до 11
-#[derive(PartialEq, Debug)]
-struct Car {
-    color: String,
-    motor: Transmission,
-    roof: bool,
-    age: (Age, u32),
-}
+//! Упражнение. Использование типа Result для обработки ошибок
+//! use std::fs::File;
+use std::fs::File;
+use std::io::{Error, Read};
+use std::path::PathBuf;
 
-#[derive(PartialEq, Debug)]
-enum Transmission {
-    Manual,
-    SemiAuto,
-    Automatic,
-}
+fn read_file_contents(path: PathBuf) -> Result<String, Error> {
+    // Создаем пустую строку, в которую будем считывать содержимое файла
+    let mut string = String::new();
 
-#[derive(PartialEq, Debug)]
-enum Age {
-    New,
-    Used,
-}
+    // Доступ к файлу по указанному пути
+    // ---------------------------------
+    // TODO #1:
+    // - Передаем переменную `file` в случае успеха, или
+    // - Возвращаемся из функции рано, если есть ошибка
+    // Получаем файловый дескриптор (handle) с помощью File::open и присваиваем его переменной file
+    let mut file: File = match File::open(&path) {
+        Ok(file_handle) => file_handle,
+        Err(io_error) => return Err(io_error),
+    };
 
-// Get the car quality by testing the value of the input argument
-// - miles (u32)
-// Return tuple with car age ("New" or "Used") and mileage
-fn car_quality(miles: u32) -> (Age, u32) {
-    // Check if car has accumulated miles
-    // Return tuple early for Used car
-    if miles > 0 {
-        return (Age::Used, miles);
-    }
+    // Считываем содержимое файла в переменную `String` с помощью `read_to_string`
+    // ---------------------------------
+    // Путь успеха уже заполнен
+    // TODO #2: Возвращаемся из функции рано, если есть ошибка
+    // Считываем содержимое файла с использованием file.read_to_string и сохраняем его в переменной string
+    match file.read_to_string(&mut string) {
+        Ok(_) => (),
+        Err(io_error) => return Err(io_error),
+    };
 
-    // Return tuple for New car, no need for "return" keyword or semicolon
-    (Age::New, miles)
-}
-
-// Build "Car" using input arguments
-fn car_factory(order: i32, miles: u32) -> Car {
-    let colors = ["Blue", "Green", "Red", "Silver"];
-
-    // Prevent panic: Check color index for colors array, reset as needed
-    // Valid color = 1, 2, 3, or 4
-    // If color > 4, reduce color to valid index
-    let mut color = order as usize;
-    while color > 4 {
-        color -= 4;
-    }
-
-    // Add variety to orders for motor type and roof type
-    let mut motor = Transmission::Manual;
-    let mut roof = true;
-    if order % 3 == 0 {
-        // 3, 6, 9
-        motor = Transmission::Automatic;
-    } else if order % 2 == 0 {
-        // 2, 4, 8, 10
-        motor = Transmission::SemiAuto;
-        roof = false;
-    } // 1, 5, 7, 11
-
-    // Return requested "Car"
-    Car {
-        color: String::from(colors[(color - 1) as usize]),
-        motor: motor,
-        roof: roof,
-        age: car_quality(miles),
-    }
+    // TODO #3: Возвращаем переменную `string` в ожидаемом формате функции
+    // Возвращаем содержимое файла как часть успешного результата, оборачиваем его в Ok
+    Ok(string)
 }
 
 fn main() {
-    use std::collections::HashMap;
+    // Проверка, успешно ли считано содержимое файла "src/main.rs"
+    if let Ok(_) = read_file_contents(PathBuf::from("src/main.rs")) {
+        println!("Программа нашла основной файл.");
+    }
 
-    let mut orders: HashMap<i32, Car> = HashMap::new();
-    let mut car: Car;
-
-    // Start with zero miles
-    let mut miles = 0;
-
-    // Loop to fulfill orders for 6 cars
-    for order in 1..=11 {
-        // Call car_factory to fulfill order
-        car = car_factory(order, miles);
-        orders.insert(order, car);
-
-        // Call println! to show order details from the hash map
-        println!("Car order {}: {:?}", order, orders.get(&order));
-
-        // Reset miles for order variety
-        if miles == 2100 {
-            miles = 0;
-        } else {
-            miles += 700;
-        }
+    // Проверка, возникла ли ошибка при считывании содержимого файла "non-existent-file.txt"
+    if let Err(_) = read_file_contents(PathBuf::from("non-existent-file.txt")) {
+        println!("Программа сообщила об ошибке для файла, который не существует.");
     }
 }
