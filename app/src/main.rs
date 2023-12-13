@@ -1,146 +1,285 @@
-// // ! Правила определения области действия
-// {
-//     // ? право собственности на переменную
-//     let mascot = Strict::from("ferris");
-//     let ferris = mascot;
-//     // мы передели право собственности  mascot  переменной ferris и mascot Больше не можем ипользоват
-// // В Rust только одна вещь может одновременно владеть частью данных.
-// }
-// // ?Право собственности на функции Передача чего-либо в качестве аргумента функции перемещает это в функцию.
-// fn process(input: String) {}
+// //! загальні типи даних
+// //? не можно змішувати👇
 
-// fn caller() {
-//     let s = String::from("Hello, world!");
-//     process(s); // Ownership of the string in `s` moved into `process`
-//     process(s); // Error! ownership already moved.
+// struct POint<T> {
+//     x: T,
+//     y: t,
 // }
-// // ? Копирование вместо перемещения. Простые типи капируются, а не перемещаются
-// fn process(input: u32) {}
-
-// fn caller() {
-//     let n = 1u32;
-//     process(n); // Ownership of the number in `n` copied into `process`
-//     process(n); // `n` can be used again because it wasn't moved, it was copied.
-// }
-// // ? Клонирование типов перед их перемещением, это трудозатратно, поэтому лучше использовать ссылки
-// fn process(s: String) {}
-
 // fn main() {
-//     let s = String::from("Hello, world!");
-//     process(s.clone()); // Passing another value, cloned from `s`.
-//     process(s); // s was never moved and so it can still be used.
+//     let boolean = Point { x: true, y: false };
+//     let integer = Point { x: 1, y: 5 };
+//     let float = Point { x: 1.5, y: 56.6 };
+//     let string_slise = Point {
+//         x: "high",
+//         y: "low",
+//     };
 // }
-// // ? силочний метод Ссылки позволяют нам «заимствовать» значения, не становя на них права собственности с помощью ссылочного символа ( &)
-// let greeting = String::from("hello");
-// let greeting_reference = &greeting; // We borrow `greeting` but the string data is still owned by `greeting`
-// println!("Greeting: {}", greeting); // We can still use `greeting`
-// // ? Ссылки в функциях
-// fn print_greeting(message: &String) {
-//   println!("Greeting: {}", message);
+//? можно змішувати👇
+// struct Point<T, U> {
+//     x: T,
+//     y: U,
 // }
 
 // fn main() {
-//   let greeting = String::from("Hello");
-//   print_greeting(&greeting); // `print_greeting` takes a `&String` not an owned `String` so we borrow `greeting` with `&`
-//   print_greeting(&greeting); // Since `greeting` didn't move into `print_greeting` we can use it again
+//     let integer_and_boolean = Point { x: 5, y: false };
+//     let float_and_string = Point { x: 1.0, y: "hey" };
+//     let integer_and_float = Point { x: 5, y: 4.0 };
+//     let both_integer = Point { x: 10, y: 30 };
+//     let both_boolean = Point { x: true, y: true };
 // }
-// //? нельзя менять заимствованные значения Этот код не скомпилируется
-
-// fn change(message: &String) {
-//   message.push_str("!"); // We try to add a "!" to the end of our message
-// }
-
-// fn main() {
-//   let greeting = String::from("Hello");
-//   change(&greeting);
-// }
-// //? вот как правельно изменять функцию по ссилке
-// fn main() {
-//     let mut greeting = String::from("hello");
-//     change(&mut greeting);
+// ? Реалізація Трейду
+// trait Area {
+//     fn area(&self) -> f64;
 // }
 
-// fn change(text: &mut String) {
-//     text.push_str(", world");
+// struct Circle {
+//     radius: f64,
 // }
-// //? Заимствование и изменяемые ссылки(ошибка)
-// fn main() {
-//     let mut value = String::from("hello");
 
-//     let ref1 = &mut value;
-//     let ref2 = &mut value;
-
-//     println!("{}, {}", ref1, ref2);
+// struct Rectangle {
+//     width: f64,
+//     height: f64,
 // }
-// //? Заимствование и изменяемые ссылки(ошибка)
-// fn main() {
-//     let mut value = String::from("hello");
 
-//     let ref1 = &value;
-//     let ref2 = &mut value;
-
-//     println!("{}, {}", ref1, ref2);
-// }
-// //? Проверка ссылок с использованием времени жизни
-// fn main() {
-//     let x;
-//     {
-//         let y = 42;
-//         x = &y; // We store a reference to `y` in `x` but `y` is about to be dropped.
-
-//     }
-// // ошибка компиляции
-//     println!("x: {}", x); // `x` refers to `y` but `y has been dropped!
-// }
-// // вроде рабочий вариант
-// fn main() {
-//     let magic1 = String::from("abracadabra!");
-//     let magic2 = String::from("shazam!");
-
-//     let result = longest_word(&magic1, &magic2);
-//     println!("The longest magic word is {}", result);
-// }
-// fn longest_word<'a>(x: &'a String, y: &'a String) -> &'a String {
-//     if x.len() > y.len() {
-//         x
-//     } else {
-//         y
+// impl Area for Circle {
+//     fn area(&self) -> f64 {
+//         use std::f64::consts::PI;
+//         PI * self.radius.powf(2.0)
 //     }
 // }
-// //? Аннотирование времени жизни в типах
-// //? Вывод в консоли
-// //Highlight("quick brown fox")
-// //Highlight("lazy dog")
 
+// impl Area for Rectangle {
+//     fn area(&self) -> f64 {
+//         self.width * self.height
+//     }
+// }
+// fn main() {
+//     let circle = Circle { radius: 5.0 };
+//     let rectangle = Rectangle {
+//         width: 10.0,
+//         height: 20.0,
+//     };
+
+//     println!("Circle area: {}", circle.area());
+//     println!("Rectangle area: {}", rectangle.area());
+// }
+// ? Використовуйте derive
+// #[derive(Debug, PartialEq)]
+// struct Point {
+//     x: i32,
+//     y: i32,
+// }
+// use std::fmt;
+
+// impl fmt::Display for Point {
+//     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+//         write!(f, "({}, {})", self.x, self.y)
+//     }
+// }
+// fn main() {
+//     let point = Point { x: 1, y: 2 };
+//     println!("Point coordinates: {}", point);
+// }
+//? Trait AsJson:
+// trait AsJson {
+//     fn as_json(&self) -> String;
+// }
+// fn send_data_as_json(value: &impl AsJson) {
+//     println!("Sending JSON data to server...");
+//     println!("-> {}", value.as_json());
+//     println!("Done!\n");
+// }
+//? ще один способ з явною ознакою Т типу
+// trait AsJson {
+//     fn as_json(&self) -> String;
+// }
+// fn send_data_as_json<T: AsJson>(value: &T) {
+//     println!("Sending JSON data to server...");
+//     println!("-> {}", value.as_json());
+//     println!("Done!\n");
+// }
+
+// struct Person {
+//     name: String,
+//     age: u8,
+//     favorite_fruit: String,
+// }
+
+// struct Dog {
+//     name: String,
+//     color: String,
+//     likes_petting: bool,
+// }
+
+// impl AsJson for Person {
+//     fn as_json(&self) -> String {
+// 	    format!(
+// 	        r#"{{ "type": "person", "name": "{}", "age": {}, "favoriteFruit": "{}" }}"#,
+// 	        self.name, self.age, self.favorite_fruit
+// 	    )
+//     }
+// }
+
+// impl AsJson for Dog {
+//     fn as_json(&self) -> String {
+// 	    format!(
+// 	        r#"{{ "type": "dog", "name": "{}", "color": "{}", "likesPetting": {} }}"#,
+// 	        self.name, self.color, self.likes_petting
+// 	    )
+//     }
+// }
+// fn main() {
+//     let laura = Person {
+//     	name: String::from("Laura"),
+// 	    age: 31,
+// 	    favorite_fruit: String::from("apples"),
+//     };
+
+//     let fido = Dog {
+// 	    name: String::from("Fido"),
+// 	    color: String::from("Black"),
+// 	    likes_petting: true,
+//     };
+
+//     send_data_as_json(&laura);
+//     send_data_as_json(&fido);
+// }
+//? Використовуйте ітератори
+// trait Iterator {
+//     type Item;
+//     fn next(&mut self) -> Option<Self::Item>;
+// }
 // #[derive(Debug)]
-// struct Highlight<'document>(&'document str);
+// struct Counter {
+//     length: usize,
+//     count: usize,
+// }
+
+// impl Counter {
+//     fn new(length: usize) -> Counter {
+//         Counter { count: 0, length }
+//     }
+// }
+// impl Iterator for Counter {
+//     type Item = usize;
+
+//     fn next(&mut self) -> Option<Self::Item> {
+//         self.count += 1;
+//         if self.count <= self.length {
+//             Some(self.count)
+//         } else {
+//             None
+//         }
+//     }
+// }
+// fn main() {
+//     let mut counter = Counter::new(6);
+//     println!("Counter just created: {:#?}", counter);
+
+//     assert_eq!(counter.next(), Some(1));
+//     assert_eq!(counter.next(), Some(2));
+//     assert_eq!(counter.next(), Some(3));
+//     assert_eq!(counter.next(), Some(4));
+//     assert_eq!(counter.next(), Some(5));
+//     assert_eq!(counter.next(), Some(6));
+//     assert_eq!(counter.next(), None);
+//     assert_eq!(counter.next(), None); // further calls to `next` will return `None`
+//     assert_eq!(counter.next(), None);
+
+//     println!("Counter exhausted: {:#?}", counter);
+// }
+//! вправа
+// struct Container<T> {
+//     value: T,
+// }
+
+// impl<T> Container<T> {
+//     pub fn new(value: T) -> Self {
+//         Container { value }
+//     }
+// }
 
 // fn main() {
-//     let text = String::from("The quick brown fox jumps over the lazy dog.");
-//     let fox = Highlight(&text[4..19]);
-//     let dog = Highlight(&text[35..43]);
-//     println!("{:?}", fox);
-//     println!("{:?}", dog);
+//     assert_eq!(Container::new(42).value, 42);
+//     assert_eq!(Container::new(3.14).value, 3.14);
+//     assert_eq!(Container::new("Foo").value, "Foo");
+//     assert_eq!(
+//         Container::new(String::from("Bar")).value,
+//         String::from("Bar")
+//     );
+//     assert_eq!(Container::new(true).value, true);
+//     assert_eq!(Container::new(-12).value, -12);
+//     assert_eq!(Container::new(Some("text")).value, Some("text"));
 // }
-// ! Упражнение – время жизни
-fn copy_and_return<'a>(vector: &'a mut Vec<String>, value: &'a str) -> &'a String {
-    vector.push(String::from(value));
-    vector.get(vector.len() - 1).unwrap()
+//! вправа
+struct Groups<T> {
+    inner: Vec<T>,
+}
+
+impl<T> Groups<T> {
+    fn new(inner: Vec<T>) -> Self {
+	    Groups { inner }
+    }
+}
+
+impl<T: PartialEq> Iterator for Groups<T> {
+    type Item = Vec<T>;
+
+    // TODO: Write the rest of this implementation.
+    fn next(&mut self) -> Option<Self::Item> {
+        // if the inner vector is empty, we are done
+        if self.inner.is_empty() {
+            return None;
+        }
+
+        // lets check the span of equal items
+        let mut cursor = 1;
+        let first = &self.inner[0];
+        for element in &self.inner[1..] {
+            if element == first {
+                cursor += 1;
+            } else {
+                break;
+            }
+        }
+
+// we use the `Vec::drain` to extract items up until the cursor
+        let items = self.inner.drain(0..cursor).collect();
+
+        // return the extracted items
+        Some(items)
+    }
 }
 
 fn main() {
-    let name1 = "Joe";
-    let name2 = "Chris";
-    let name3 = "Anne";
-
-    let mut names = Vec::new();
-
-    assert_eq!("Joe", copy_and_return(&mut names, &name1));
-    assert_eq!("Chris", copy_and_return(&mut names, &name2));
-    assert_eq!("Anne", copy_and_return(&mut names, &name3));
-
+    let data = vec![4, 1, 1, 2, 1, 3, 3, -2, -2, -2, 5, 5];
+    // groups:     |->|---->|->|->|--->|----------->|--->|
     assert_eq!(
-        names,
-        vec!["Joe".to_string(), "Chris".to_string(), "Anne".to_string()]
+	    Groups::new(data).into_iter().collect::<Vec<Vec<_>>>(),
+	    vec![
+	        vec![4],
+    	    vec![1, 1],
+	        vec![2],
+    	    vec![1],
+	        vec![3, 3],
+	        vec![-2, -2, -2],
+    	    vec![5, 5],
+	    ]
+    );
+
+    let data2 = vec![1, 2, 2, 1, 1, 2, 2, 3, 4, 4, 3];
+    // groups:      |->|---->|---->|----|->|----->|->|
+    assert_eq!(
+	    Groups::new(data2).into_iter().collect::<Vec<Vec<_>>>(),
+	    vec![
+	        vec![1],
+    	    vec![2, 2],
+	        vec![1, 1],
+	        vec![2, 2],
+    	    vec![3],
+	        vec![4, 4],
+	        vec![3],
+	    ]
     )
 }
+
