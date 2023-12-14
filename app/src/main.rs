@@ -1,89 +1,104 @@
-// //? A package - пакет
-// $ cargo new <project-name>
-// my-project
-// ├── src
-// │  └── main.rs
-// └── Cargo.toml
-// //? A crate - Ящик
-// cargo new:
-// $ cargo new --lib my-library
-//      Created library `my-library` package
-// my-library
-// ├── src
-// │  └── lib.rs
-// └── Cargo.toml
-// //?A module - Модуль
-// Константи
-// Введіть псевдоніми
-// Функції
-// Структури
-// Enums
-// Риси
-// implблоки
-// Інші модулі
-// mod math {
-//     type Complex = (f64, f64);
-//     pub fn sin(f: f64) -> f64 { /* ... */ }
-//     pub fn cos(f: f64) -> f64 { /* ... */ }
-//     pub fn tan(f: f64) -> f64 { /* ... */ }
+//! Модульні тести в Rust
+// fn add(a: i32, b: i32) -> i32 {
+//     a + b
+// }
+// #[test]
+
+// fn add_works() {
+//     assert_eq!(add(1, 2), 3);
+//     assert_eq!(add(10, 12), 22);
+//     assert_eq!(add(5, -2), 3);
 // }
 
-// println!("{}", math::cos(45.0));
-
-// // Declare a private struct
-// struct Foo;
-
-// // Declare a public struct with a private field
-// pub struct Bar {
-//     field: i32,
+// fn add(a: i32, b: i32) -> i32 {
+//     a + b
+// }
+// //? Очікувані невдачі
+// #[test]
+// #[should_panic]
+// fn add_works() {
+//     assert_eq!(add(1, 2), 3);
+//     assert_eq!(add(10, 12), 22);
+//     assert_eq!(add(5, -2), 4);
 // }
 
-// // Declare a public enum with two public variants
-// pub enum State {
-//     PubliclyAccessibleVariant,
-//     PubliclyAccessibleVariant2,
+// //? Ігноруйте тести
+// #[test]
+// #[ignore = "not yet reviewed by the Q.A. team"]
+// fn add_negatives() {
+//     assert_eq!(add(-2, -2), -4)
 // }
-// mod authentication;
-
-// fn main() {
-//     let mut user = authentication::User::new("jeremy", "super-secret");
-
-//     println!("The username is: {}", user.get_username());
-//     user.set_password("even-more-secret");
+//  //! Більшість модульних тестів входять до підмодуля з #[cfg(test)]атрибутом.
+//  //! fn add(a: i32, b: i32) -> i32 {
+//     a + b
 // }
-//? Вправа – Наочність
-// mod car_factory {
-//     pub fn build_car() {
-//         println!("Honk honk!");
+
+// #[cfg(test)]
+// mod add_function_tests {
+//     use super::*;
+
+//     #[test]
+//     fn add_works() {
+//         assert_eq!(add(1, 2), 3);
+//         assert_eq!(add(10, 12), 22);
+//         assert_eq!(add(5, -2), 3);
+//     }
+
+//     #[test]
+//     #[should_panic]
+//     fn add_fails() {
+//         assert_eq!(add(2, 2), 7);
+//     }
+
+//     #[test]
+//     #[ignore]
+//     fn add_negatives() {
+//         assert_eq!(add(-2, -2), -4)
 //     }
 // }
-
-// fn main() {
-//     car_factory::build_car();
+//! Вправа
+// pub fn is_even(num: i32) -> bool {
+//     num % 2 == 0
 // }
-//? Вправа - Модулі
-mod text_processing {
-    pub mod letters {
-        pub fn count_letters(text: &str) -> usize {
-            text.chars().filter(|c| c.is_alphabetic()).count()
-        }
-    }
 
-    pub mod numbers {
-        pub fn count_numbers(text: &str) -> usize {
-            text.chars().filter(|c| c.is_numeric()).count()
-        }
-    }
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+
+//     #[test]
+//     fn is_true_when_even() {
+//         assert!(is_even(2));
+//     }
+
+//     #[test]
+//     fn is_false_when_odd() {
+//         assert!(!is_even(1));
+//     }
+// }
+// ? тести з документації
+// $ cargo new --lib basic_math
+// $ cd basic_math
+// pub fn add(a: i32, b: i32) -> i32 {
+//     a + b
+// }
+pub struct Pizza {
+    pub topping: String,
+    pub inches: u8,
 }
 
-fn count_letters_and_numbers(text: &str) -> (usize, usize) {
-    let number_of_letters = text_processing::letters::count_letters(text);
-    let number_of_numbers = text_processing::numbers::count_numbers(text);
-    (number_of_letters, number_of_numbers)
-}
+impl Pizza {
+    pub fn pepperoni(inches: u8) -> Self {
+        Pizza::bake("pepperoni", inches)
+    }
 
-fn main() {
-    assert_eq!(count_letters_and_numbers("221B Baker Street"), (12, 3));
-    assert_eq!(count_letters_and_numbers("711 Maple Street"), (11, 3));
-    assert_eq!(count_letters_and_numbers("4 Privet Drive"), (11, 1));
+    pub fn mozzarella(inches: u8) -> Self {
+        Pizza::bake("mozzarella", inches)
+    }
+
+    fn bake(topping: &str, inches: u8) -> Self {
+        Pizza {
+            topping: String::from(topping),
+            inches,
+        }
+    }
 }
